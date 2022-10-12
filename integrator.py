@@ -29,8 +29,8 @@ dbconfig = {
 config = {
     # dispatcher2 confs
     'dispatcher2_queue_url':'http://localhost:9191/queue',
-    'dispatcher2_username': 'xxxx',
-    'dispatcher2_password': 'xxxx',
+    'dispatcher2_username': 'admin',
+    'dispatcher2_password': 'admin',
     'dispatcher2_source': 'hmis',
     'dispatcher2_destination': 'repo',
 }
@@ -134,106 +134,103 @@ def get_reporting_period(
         start_date = end_date - datetime.timedelta(days=days_back)
         return [], start_date, end_date
 
-    match frequency:
-        case "Daily":
-            if period:
-                try:
-                    start_date = datetime.datetime.strptime(period, '%Y%m%d').date()
-                    end_date = start_date
-                    return [period], start_date, end_date
-                except:
-                    start_date = datetime.date(now.year, now.month, now.day)
-                    end_date = start_date
-            if not year:
-                start_date =  datetime.date(now.year, now.month, 1)
-                end_date =  datetime.date(now.year, now.month, now.day)
-            elif year and year <= now.year:
-                if year == now.year:
-                    if month:
-                        month = month if month <= now.month else now.month
-                        start_date =  datetime.date(year, month, 1)
-                        if month == 2:
-                            try:
-                                end_date =  datetime.date(year, month, 28)
-                            except:
-                                end_date =  datetime.date(year, month, 29)
-                        else:
-                            end_date =  datetime.date(year, month, MONTH_DAYS[month])
+    if frequency == "Daily":
+        if period:
+            try:
+                start_date = datetime.datetime.strptime(period, '%Y%m%d').date()
+                end_date = start_date
+                return [period], start_date, end_date
+            except:
+                start_date = datetime.date(now.year, now.month, now.day)
+                end_date = start_date
+        if not year:
+            start_date =  datetime.date(now.year, now.month, 1)
+            end_date =  datetime.date(now.year, now.month, now.day)
+        elif year and year <= now.year:
+            if year == now.year:
+                if month:
+                    month = month if month <= now.month else now.month
+                    start_date =  datetime.date(year, month, 1)
+                    if month == 2:
+                        try:
+                            end_date =  datetime.date(year, month, 28)
+                        except:
+                            end_date =  datetime.date(year, month, 29)
                     else:
-                        start_date =  datetime.date(year, 1, 1)
-                        end_date =  datetime.date(year, now.month, now.day)
+                        end_date =  datetime.date(year, month, MONTH_DAYS[month])
                 else:
-                    if month:
-                        start_date =  datetime.date(year, month, 1)
-                        if month == 2:
-                            try:
-                                end_date =  datetime.date(year, month, 28)
-                            except:
-                                end_date =  datetime.date(year, month, 29)
-                        else:
-                            end_date =  datetime.date(year, month, MONTH_DAYS[month])
-
-                    else:
-                        start_date =  datetime.date(year, 1, 1)
-                        end_date = datetime.date(year, 12, 31)
-
-        case "Monthly":
-            if period:
-                return [period], None, None
-            if not year:
-                # use current year
-                if not month:
-                    period = ["{0}{1:02d}".format(now.year, now.month) for m in range(1, now.month + 1)]
-                else:
-                    if month <= now.month:
-                        period = ["{0}{1:02d}".format(now.year, month)]
-                    else:
-                        # period = ["{0}{1:02d}".format(now.year, now.month)]
-                        period = []
-            elif year and year <= now.year:
-                if not month:
-                    if year == now.year:
-                        period = ["{0}{1:02d}".format(year, m) for m in range(1, now.month + 1)]
-                    else:
-                        period = ["{0}{1:02d}".format(year, m) for m in range(1, 13)]
-                else:
-                    period = ["{0}{1:02d}".format(year, month)]
-        case "Quarterly":
-            if period:
-                pass
-            current_quarter =  ((now.month - 1) // 3) + 1
-            if not year:
-                if not quarter:
-                    period = ["{0}Q{1}".format(now.year, q) for q in range(1, current_quarter + 1)]
-                else:
-                    if quarter <= current_quarter:
-                        period = ["{0}Q{1}".format(now.year, quarter)]
-                    else:
-                        period =[]
-
-            elif year and  year <= now.year:
-                if not quarter:
-                    if year == now.year:
-                        period = ["{0}Q{1}".format(year, q) for q in range(1, current_quarter + 1)]
-                    else:
-                        period = ["{0}Q{1}".format(year, q) for q in range(1, 5)]
-
-                else:
-                    if quarter <= current_quarter:
-                        period = ["{0}Q{1}".format(year, quarter)]
-                    else:
-                        period = []
-        case "Yearly":
-            if period:
-                pass
-            if not year:
-                period = [now.year]
+                    start_date =  datetime.date(year, 1, 1)
+                    end_date =  datetime.date(year, now.month, now.day)
             else:
-                period = [year]
-        case "FinancialJuly":
+                if month:
+                    start_date =  datetime.date(year, month, 1)
+                    if month == 2:
+                        try:
+                            end_date =  datetime.date(year, month, 28)
+                        except:
+                            end_date =  datetime.date(year, month, 29)
+                    else:
+                        end_date =  datetime.date(year, month, MONTH_DAYS[month])
+
+                else:
+                    start_date =  datetime.date(year, 1, 1)
+                    end_date = datetime.date(year, 12, 31)
+
+    if frequency == "Monthly":
+        if period:
+            return [period], None, None
+        if not year:
+            # use current year
+            if not month:
+                period = ["{0}{1:02d}".format(now.year, now.month) for m in range(1, now.month + 1)]
+            else:
+                if month <= now.month:
+                    period = ["{0}{1:02d}".format(now.year, month)]
+                else:
+                    # period = ["{0}{1:02d}".format(now.year, now.month)]
+                    period = []
+        elif year and year <= now.year:
+            if not month:
+                if year == now.year:
+                    period = ["{0}{1:02d}".format(year, m) for m in range(1, now.month + 1)]
+                else:
+                    period = ["{0}{1:02d}".format(year, m) for m in range(1, 13)]
+            else:
+                period = ["{0}{1:02d}".format(year, month)]
+    if frequency == "Quarterly":
+        if period:
             pass
-        case _:
+        current_quarter =  ((now.month - 1) // 3) + 1
+        if not year:
+            if not quarter:
+                period = ["{0}Q{1}".format(now.year, q) for q in range(1, current_quarter + 1)]
+            else:
+                if quarter <= current_quarter:
+                    period = ["{0}Q{1}".format(now.year, quarter)]
+                else:
+                    period =[]
+
+        elif year and  year <= now.year:
+            if not quarter:
+                if year == now.year:
+                    period = ["{0}Q{1}".format(year, q) for q in range(1, current_quarter + 1)]
+                else:
+                    period = ["{0}Q{1}".format(year, q) for q in range(1, 5)]
+
+            else:
+                if quarter <= current_quarter:
+                    period = ["{0}Q{1}".format(year, quarter)]
+                else:
+                    period = []
+    if frequency == "Yearly":
+        if period:
             pass
+        if not year:
+            period = [now.year]
+        else:
+            period = [year]
+    if frequency == "FinancialJuly":
+        pass
 
     return period, start_date, end_date
 
