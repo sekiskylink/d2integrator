@@ -396,12 +396,14 @@ for pair in integration_pairs:
                                     "orgUnit": d["orgUnit"],
                                     "categoryOptionCombo": d["categoryOptionCombo"],
                                     "attributeOptionCombo": d['attributeOptionCombo'],
-                                    "value": d["value"],
+                                    # "value": d["value"],
                                     # "storedBy": d["storedBy"],
                                     "created": d["created"],
                                     # "followup": d["followup"],
                                     "lastUpdated": d["lastUpdated"]
                                 }
+                                if 'value' in d:
+                                    dv['value'] = d["value"]
                                 if 'storedBy' in d:
                                     dv['storedBy'] = d['storedBy']
                                 if 'followup' in d:
