@@ -409,10 +409,10 @@ for pair in integration_pairs:
                                 if 'followup' in d:
                                     dv['followup'] = d['followup']
                                 bulk_payload["dataValues"].append(dv)
-                                print(
-                                    dv['dataElement'], dv['orgUnit'], dv['lastUpdated'],
-                                    dv['value'], dv['created'], dv['period'],
-                                    dv['attributeOptionCombo'], dv['categoryOptionCombo'])
+                                # print(
+                                #     dv['dataElement'], dv['orgUnit'], dv['lastUpdated'],
+                                #     dv['value'], dv['created'], dv['period'],
+                                #     dv['attributeOptionCombo'], dv['categoryOptionCombo'])
                                 if count > 15:
                                     print(bulk_payload)
                                     extra_params = {
