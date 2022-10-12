@@ -29,8 +29,8 @@ dbconfig = {
 config = {
     # dispatcher2 confs
     'dispatcher2_queue_url':'http://localhost:9191/queue',
-    'dispatcher2_username': 'admin',
-    'dispatcher2_password': 'admin',
+    'dispatcher2_username': 'xxxx',
+    'dispatcher2_password': 'xxxx',
     'dispatcher2_source': 'hmis',
     'dispatcher2_destination': 'repo',
 }
