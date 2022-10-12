@@ -390,24 +390,27 @@ for pair in integration_pairs:
                                 count += 1
                                 total_values += 1
                                 # print(d)
-                                bulk_payload["dataValues"].append(
-                                    {
-                                        "dataElement": d["dataElement"],
-                                        "period": d["period"],
-                                        "orgUnit": d["orgUnit"],
-                                        "categoryOptionCombo": d["categoryOptionCombo"],
-                                        "attributeOptionCombo": d['attributeOptionCombo'],
-                                        "value": d["value"],
-                                        "storedBy": d["storedBy"],
-                                        "created": d["created"],
-                                        "followup": d["followup"],
-                                        "lastUpdated": d["lastUpdated"]
-                                    }
-                                )
+                                dv = {
+                                    "dataElement": d["dataElement"],
+                                    "period": d["period"],
+                                    "orgUnit": d["orgUnit"],
+                                    "categoryOptionCombo": d["categoryOptionCombo"],
+                                    "attributeOptionCombo": d['attributeOptionCombo'],
+                                    "value": d["value"],
+                                    # "storedBy": d["storedBy"],
+                                    "created": d["created"],
+                                    # "followup": d["followup"],
+                                    "lastUpdated": d["lastUpdated"]
+                                }
+                                if 'storedBy' in d:
+                                    dv['storedBy'] = d['storedBy']
+                                if 'followup' in d:
+                                    dv['followup'] = d['followup']
+                                bulk_payload["dataValues"].append(dv)
                                 print(
-                                    d['dataElement'], d['orgUnit'], d['lastUpdated'],
-                                    d['value'], d['storedBy'], d['created'], d['followup'], d['period'],
-                                    d['attributeOptionCombo'], d['categoryOptionCombo'])
+                                    dv['dataElement'], dv['orgUnit'], dv['lastUpdated'],
+                                    dv['value'], dv['created'], dv['period'],
+                                    dv['attributeOptionCombo'], dv['categoryOptionCombo'])
                                 if count > 15:
                                     print(bulk_payload)
                                     extra_params = {
