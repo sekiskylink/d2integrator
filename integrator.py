@@ -386,52 +386,55 @@ for pair in integration_pairs:
                             count = 0
                             total_values = 0
                             bulk_payload = {"dataValues": []}
-                            for d in json_stream.requests.load(dv_response)["dataValues"].persistent():
-                                count += 1
-                                total_values += 1
-                                # print(d)
-                                dv = {
-                                    "dataElement": d["dataElement"],
-                                    "period": d["period"],
-                                    "orgUnit": d["orgUnit"],
-                                    "categoryOptionCombo": d["categoryOptionCombo"],
-                                    "attributeOptionCombo": d['attributeOptionCombo'],
-                                    # "value": d["value"],
-                                    # "storedBy": d["storedBy"],
-                                    "created": d["created"],
-                                    # "followup": d["followup"],
-                                    "lastUpdated": d["lastUpdated"]
-                                }
-                                if 'value' in d:
-                                    dv['value'] = d["value"]
-                                if 'storedBy' in d:
-                                    dv['storedBy'] = d['storedBy']
-                                if 'followup' in d:
-                                    dv['followup'] = d['followup']
-                                bulk_payload["dataValues"].append(dv)
-                                # print(
-                                #     dv['dataElement'], dv['orgUnit'], dv['lastUpdated'],
-                                #     dv['value'], dv['created'], dv['period'],
-                                #     dv['attributeOptionCombo'], dv['categoryOptionCombo'])
-                                if count > 15:
-                                    print(bulk_payload)
-                                    extra_params = {
-                                        'year': year,
-                                        'month': month,
-                                        'source': pair['source'],
-                                        'destination': pair['destination'],
-                                        'facility': orgunit['dhis2_name'],
-                                        'is_qparams': "f",
-                                        'report_type': '{0}'.format(dataset['dataset_id'])
+                            try:
+                                for d in json_stream.requests.load(dv_response)["dataValues"].persistent():
+                                    count += 1
+                                    total_values += 1
+                                    # print(d)
+                                    dv = {
+                                        "dataElement": d["dataElement"],
+                                        "period": d["period"],
+                                        "orgUnit": d["orgUnit"],
+                                        "categoryOptionCombo": d["categoryOptionCombo"],
+                                        "attributeOptionCombo": d['attributeOptionCombo'],
+                                        # "value": d["value"],
+                                        # "storedBy": d["storedBy"],
+                                        "created": d["created"],
+                                        # "followup": d["followup"],
+                                        "lastUpdated": d["lastUpdated"]
                                     }
-                                    try:
-                                        queue_in_dispatcher2(json.dumps(bulk_payload), ctype="json", params=extra_params)
-                                    except:
-                                        time.sleep(4)
-                                        print("Failed to queue for: ", period)
-                                    bulk_payload = {"dataValues": []}
-                                    count = 0
-                                    # break
+                                    if 'value' in d:
+                                        dv['value'] = d["value"]
+                                    if 'storedBy' in d:
+                                        dv['storedBy'] = d['storedBy']
+                                    if 'followup' in d:
+                                        dv['followup'] = d['followup']
+                                    bulk_payload["dataValues"].append(dv)
+                                    # print(
+                                    #     dv['dataElement'], dv['orgUnit'], dv['lastUpdated'],
+                                    #     dv['value'], dv['created'], dv['period'],
+                                    #     dv['attributeOptionCombo'], dv['categoryOptionCombo'])
+                                    if count > 15:
+                                        print(bulk_payload)
+                                        extra_params = {
+                                            'year': year,
+                                            'month': month,
+                                            'source': pair['source'],
+                                            'destination': pair['destination'],
+                                            'facility': orgunit['dhis2_name'],
+                                            'is_qparams': "f",
+                                            'report_type': '{0}'.format(dataset['dataset_id'])
+                                        }
+                                        try:
+                                            queue_in_dispatcher2(json.dumps(bulk_payload), ctype="json", params=extra_params)
+                                        except:
+                                            time.sleep(4)
+                                            print("Failed to queue for: ", period)
+                                        bulk_payload = {"dataValues": []}
+                                        count = 0
+                                        # break
+                            except Exception as e:
+                                print("Failed to stream datavalues for:{0} period:{1}, Error: {2}", (orgunit, period, str(e)))
 
                         print("Finished fetching data for period:{0}, orgUnit:{1}, dataSet:{2}, Total Values: {3}".format(
                             period, orgunit['dhis2_name'], dataset['dataset_id'], total_values))
