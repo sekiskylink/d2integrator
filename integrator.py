@@ -105,18 +105,18 @@ for option, parameter in opts:
         print("optionally via dispatcher2 or another data exhange middleware.")
         print("")
         print(
-            "Usage: python aggregate_integrator.py [-d ] [-c ] [-y <year>] [-m <month>] [-p <period>] [-n <days>] [-l <district_list>]")
+            "Usage: python integrator.py [-i] [-d ] [-c ] [-y <year>] [-m <month>] [-p <period>] [-n <days>] [-l <district_list>]")
         print("-d Direct synchronisation without use of data exchange middleware.")
         print("-c --current_date Whether to generate values only for the date when script is run.")
-        print("-y --year The year for which to generate vales.")
-        print("-m --month The month for which to generate/pull values before submission.")
-        print("-n --days_back Generate values pre dating n days back.")
+        print("-y --year The year for which to read and push values.")
+        print("-m --month The month for which to read values for pushing to another instance.")
+        print("-q --quarter The quarter for which to read values for pushing to another instance.")
+        print("-n --days_back read and send values pre dating n days.")
         print("-p --period The DHIS 2 period used for pulling data from source instance. Format YYYYMMDD")
         print("-l --district_list A string of comma-separated district names")
-        print("-s --sqlview The DHIS2 ID of the SQLVIEW that returns our aggregate values")
+        print("-i --incremental whether to do incremental/continuous synchronisation based on last successful sync.")
         print("-h --help This message.")
         sys.exit(2)
-
 
 def get_reporting_period(
         frequency="Daily", period=None, year=None, month=None,
@@ -355,7 +355,7 @@ for pair in integration_pairs:
             use_current_date=USE_CURRENT_DATE, days_back=days_back)
 
         if INCREMENTAL_INTEGRATION:  # The so-called continuous integration
-            pass
+            pass  # remove this and just add lastUpdated to last sync for each dataSet
         else:
             if reporting_frequency == 'Daily':
                 print(reporting_periods)
@@ -434,7 +434,7 @@ for pair in integration_pairs:
                                         count = 0
                                         # break
                             except Exception as e:
-                                print("Failed to stream datavalues for:{0} period:{1}, Error: {2}", (orgunit, period, str(e)))
+                                print("Failed to stream datavalues for:{0} period:{1}, Error: {2}".format(orgunit, period, str(e)))
 
                         print("Finished fetching data for period:{0}, orgUnit:{1}, dataSet:{2}, Total Values: {3}".format(
                             period, orgunit['dhis2_name'], dataset['dataset_id'], total_values))
